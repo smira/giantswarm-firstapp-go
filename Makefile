@@ -3,7 +3,6 @@ ORGANIZATION=giantswarm
 REGISTRY = registry.giantswarm.io
 USERNAME := $(shell swarm user)
 
-
 SOURCE := $(shell find . -name '*.go')
 GOPATH := $(shell pwd)/.gobuild
 PROJECT_PATH := $(GOPATH)/src/github.com/$(ORGANIZATION)
@@ -17,16 +16,14 @@ all: deps $(PROJECT)
 clean:
 	rm -rf $(GOPATH) $(PROJECT)
 
-# deps
 deps: .gobuild
 .gobuild:
 	mkdir -p $(PROJECT_PATH)
 	cd $(PROJECT_PATH) && ln -s ../../../.. $(PROJECT)
 
 	# Fetch private packages first (so `go get` skips them later)
-	# git clone git@git.giantswarm.io:giantswarm/eventstream.git $(PROJECT_PATH)/eventstream
+	# git clone git@github.com:giantswarm/example.git $(PROJECT_PATH)/example
 
-	#
 	# Fetch public packages
 	GOPATH=$(GOPATH) go get -d github.com/$(ORGANIZATION)/$(PROJECT)
 

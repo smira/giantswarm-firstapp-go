@@ -5,7 +5,7 @@
       "service_name": "currentweather-service",
       "components": [
         {
-          "component_name": "golang",
+          "component_name": "webserver",
           "image": "registry.giantswarm.io/$username/currentweather:latest",
           "ports": ["8080/tcp"],
           "dependencies": [
