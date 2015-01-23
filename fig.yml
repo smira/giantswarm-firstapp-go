@@ -1,0 +1,8 @@
+currentweather:
+  build: "."
+  links:
+    - redis:redis
+redis: 
+  image: redis:latest
+  ports:
+    - 6379
