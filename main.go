@@ -31,7 +31,7 @@ func main() {
 
 	http.HandleFunc("/", currentWeatherHandler)
 
-	fmt.Println("Starting Helloworld server")
+	fmt.Println("Starting current weather server")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
