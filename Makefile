@@ -45,7 +45,7 @@ $(PROJECT): VERSION $(SOURCE)
 	    -e GOARCH=$(GOARCH) \
 	    -w /usr/code \
 	    golang:1.3.1-cross \
-	    go build -a -ldflags "-X main.projectVersion $(VERSION) -X main.projectBuild $(COMMIT)" -o $(BIN)
+	    go build -a -o $(PROJECT)
 
 $(RELEASE_PATH):
 	mkdir $(RELEASE_PATH)
