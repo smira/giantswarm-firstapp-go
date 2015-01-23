@@ -22,7 +22,7 @@ type WeatherReport struct {
 
 func main() {
 	var err error
-	fmt.Println("Establishing connection to Redis")
+	log.Println("Establishing connection to Redis")
 	redisCon, err = redis.Dial("tcp", redisAddress())
 	if err != nil {
 		log.Fatalf("Could not connect to Redis with error: %s", err)
@@ -31,7 +31,7 @@ func main() {
 
 	http.HandleFunc("/", currentWeatherHandler)
 
-	fmt.Println("Starting current weather server")
+	log.Println("Starting current weather server")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
