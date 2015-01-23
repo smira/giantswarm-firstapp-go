@@ -1,0 +1,29 @@
+{
+  "app_name": "currentweather",
+  "services": [
+    {
+      "service_name": "currentweather-service",
+      "components": [
+        {
+          "component_name": "golang",
+          "image": "registry.giantswarm.io/$username/currentweather:latest",
+          "ports": ["8080/tcp"],
+          "dependencies": [
+            {
+              "name": "redis",
+              "port": 6379
+            }
+          ],
+          "domains": {
+            "currentweather-$username.gigantic.io": "8080"
+          }
+        },
+        {
+          "component_name": "redis",
+          "image": "redis",
+          "ports": ["6379/tcp"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 PROJECT=currentweather
 ORGANIZATION=giantswarm
+REGISTRY = registry.giantswarm.io
+USERNAME := $(shell swarm user)
+
 
 SOURCE := $(shell find . -name '*.go')
 GOPATH := $(shell pwd)/.gobuild
@@ -7,7 +10,7 @@ PROJECT_PATH := $(GOPATH)/src/github.com/$(ORGANIZATION)
 GOOS := linux
 GOARCH := amd64
 
-.PHONY=all clean deps $(PROJECT) up
+.PHONY=all clean deps $(PROJECT) swarm-up docker-build docker-push docker-pull
 
 all: deps $(PROJECT)
 
@@ -40,6 +43,21 @@ $(PROJECT): $(SOURCE)
 	    golang:1.3.1-cross \
 	    go build -a -o $(PROJECT)
 
-up: $(PROJECT)
+fig-up: $(PROJECT)
 	fig build
 	fig up
+
+docker-build: $(PROJECT)
+	docker build -t $(REGISTRY)/$(USERNAME)/$(PROJECT) .
+
+docker-push: docker-build
+	docker push $(REGISTRY)/$(USERNAME)/$(PROJECT)
+
+docker-pull:
+	docker pull $(REGISTRY)/$(USERNAME)/$(PROJECT)
+
+swarm-delete:
+	swarm delete $(PROJECT)
+
+swarm-up: docker-push
+	swarm up swarm.json --var=username=$(USERNAME)
