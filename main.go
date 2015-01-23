@@ -21,11 +21,13 @@ type WeatherReport struct {
 }
 
 func main() {
+	var err error
 	fmt.Println("Establishing connection to Redis")
-	_, err := redis.Dial("tcp", redisAddress())
+	redisCon, err = redis.Dial("tcp", redisAddress())
 	if err != nil {
 		log.Fatalf("Could not connect to Redis with error: %s", err)
 	}
+	defer redisCon.Close()
 
 	http.HandleFunc("/", currentWeatherHandler)
 
@@ -38,7 +40,7 @@ func currentWeatherHandler(w http.ResponseWriter, r *http.Request) {
 
 	report, err := getWeatherReport()
 	if err != nil {
-		fmt.Fprintf(w, "Cannot get weather data\n")
+		fmt.Fprintf(w, "Cannot get weather data: %s\n", err)
 	} else {
 		celsius := report.Main.Temperature - 273
 		fmt.Fprintf(w, "Current temperature is %.2f °C\n", celsius)
@@ -48,13 +50,7 @@ func currentWeatherHandler(w http.ResponseWriter, r *http.Request) {
 func getWeatherReport() (WeatherReport, error) {
 	var report WeatherReport
 
-	resp, err := http.Get("http://api.openweathermap.org/data/2.5/weather?q=Cologne")
-	if err != nil {
-		return report, err
-	}
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := cacheReport(getWeatherReportData)
 	if err != nil {
 		return report, err
 	}
@@ -64,6 +60,35 @@ func getWeatherReport() (WeatherReport, error) {
 	}
 
 	return report, nil
+}
+
+func getWeatherReportData() ([]byte, error) {
+	var data []byte
+	resp, err := http.Get("http://api.openweathermap.org/data/2.5/weather?q=Cologne")
+	if err != nil {
+		return data, err
+	}
+	defer resp.Body.Close()
+
+	data, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return data, err
+	}
+	return data, nil
+}
+
+func cacheReport(f func() ([]byte, error)) ([]byte, error) {
+	data, _ := redis.Bytes(redisCon.Do("GET", "report"))
+	if len(data) == 0 {
+		res, err := f()
+		if err != nil {
+			return nil, err
+		}
+		redisCon.Do("SET", "report", res)
+		redisCon.Do("EXPIRE", "report", 60)
+		data = res
+	}
+	return data, nil
 }
 
 func redisAddress() string {
