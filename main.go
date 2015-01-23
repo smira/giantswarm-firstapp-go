@@ -36,8 +36,6 @@ func main() {
 }
 
 func currentWeatherHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello world again\n")
-
 	report, err := getWeatherReport()
 	if err != nil {
 		fmt.Fprintf(w, "Cannot get weather data: %s\n", err)
