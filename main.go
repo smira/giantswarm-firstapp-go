@@ -15,15 +15,9 @@ import (
 var redisCon redis.Conn
 
 type WeatherReport struct {
-	Main WeatherMain `json:main`
-}
-
-type WeatherMain struct {
-	Temeperature float64 `json:temp`
-}
-
-func (wm WeatherMain) TemeperatureCelsius() float64 {
-	return wm.Temeperature
+	Main struct {
+		Temperature float64 `json:"temp"`
+	}
 }
 
 func main() {
@@ -46,7 +40,8 @@ func currentWeatherHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(w, "Cannot get weather data\n")
 	} else {
-		fmt.Fprintf(w, "Current temperature is %f °C\n", report.Main.TemeperatureCelsius())
+		celsius := report.Main.Temperature - 273
+		fmt.Fprintf(w, "Current temperature is %.2f °C\n", celsius)
 	}
 }
 
