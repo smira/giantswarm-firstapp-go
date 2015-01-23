@@ -19,7 +19,7 @@
           }
         },
         {
-          "component_name": "redis",
+          "component_name": "redis:latest",
           "image": "redis",
           "ports": ["6379/tcp"]
         }
