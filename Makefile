@@ -7,15 +7,19 @@ GOPATH := $(shell pwd)/.gobuild
 PROJECT_PATH := $(GOPATH)/src/github.com/$(ORGANIZATION)
 RELEASE_PATH := $(shell pwd)/release
 
-.PHONY=all clean test deps bin
+ifndef GOOS
+	GOOS := $(shell go env GOOS)
+endif
+ifndef GOARCH
+	GOARCH := $(shell go env GOARCH)
+endif
+
+.PHONY=all clean deps bin
 
 all: deps $(PROJECT)
 
 clean:
-	rm -rf $(GOPATH) $(PROJECT) simple
-
-test:
-	GOPATH=$(GOPATH) go test ./...
+	rm -rf $(GOPATH) $(PROJECT)
 
 # deps
 deps: .gobuild
@@ -30,19 +34,7 @@ deps: .gobuild
 	# Fetch public packages
 	GOPATH=$(GOPATH) go get -d github.com/$(ORGANIZATION)/$(PROJECT)
 
-	#
-	# Fetch test packages
-	GOPATH=$(GOPATH) go get -d github.com/onsi/gomega
-	GOPATH=$(GOPATH) go get -d github.com/onsi/ginkgo
-
-# build
-$(PROJECT): $(SOURCE) VERSION
-	GOPATH=$(GOPATH) go build -ldflags "-X main.projectVersion $(VERSION)" -o $(PROJECT)
-
-install: $(PROJECT)
-	cp $(PROJECT) /usr/local/bin/
-
-$(BIN): VERSION $(SOURCE) 
+$(PROJECT): VERSION $(SOURCE) 
 	echo Building for $(GOOS)/$(GOARCH)
 	docker run \
 	    --rm \
