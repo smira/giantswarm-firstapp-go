@@ -8,6 +8,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/garyburd/redigo/redis"
 )
@@ -31,8 +33,15 @@ func main() {
 
 	http.HandleFunc("/", currentWeatherHandler)
 
-	log.Println("Starting current weather server")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	go func() {
+		log.Println("Starting current weather server")
+		log.Fatal(http.ListenAndServe(":8080", nil))
+	}()
+
+	// Handle SIGINT and SIGTERM.
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	log.Println(<-ch)
 }
 
 func currentWeatherHandler(w http.ResponseWriter, r *http.Request) {
