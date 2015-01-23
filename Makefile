@@ -2,19 +2,12 @@ PROJECT=currentweather
 ORGANIZATION=giantswarm
 
 SOURCE := $(shell find . -name '*.go')
-VERSION := $(shell cat VERSION)
 GOPATH := $(shell pwd)/.gobuild
 PROJECT_PATH := $(GOPATH)/src/github.com/$(ORGANIZATION)
-RELEASE_PATH := $(shell pwd)/release
+GOOS := linux
+GOARCH := amd64
 
-ifndef GOOS
-	GOOS := $(shell go env GOOS)
-endif
-ifndef GOARCH
-	GOARCH := $(shell go env GOARCH)
-endif
-
-.PHONY=all clean deps bin
+.PHONY=all clean deps $(PROJECT) up
 
 all: deps $(PROJECT)
 
@@ -34,7 +27,7 @@ deps: .gobuild
 	# Fetch public packages
 	GOPATH=$(GOPATH) go get -d github.com/$(ORGANIZATION)/$(PROJECT)
 
-$(PROJECT): VERSION $(SOURCE) 
+$(PROJECT): $(SOURCE) 
 	echo Building for $(GOOS)/$(GOARCH)
 	docker run \
 	    --rm \
@@ -47,11 +40,6 @@ $(PROJECT): VERSION $(SOURCE)
 	    golang:1.3.1-cross \
 	    go build -a -o $(PROJECT)
 
-$(RELEASE_PATH):
-	mkdir $(RELEASE_PATH)
-
-crosscompile: deps $(RELEASE_PATH) $(SOURCE)
-	./crosscompile.sh $(RELEASE_PATH)
-
 up: $(PROJECT)
+	fig build
 	fig up
