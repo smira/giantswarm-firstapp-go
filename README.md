@@ -28,3 +28,10 @@ To deploy it on Giant Swarm you just have to do a 'make swarm-up'. This:
 To test it run something like: `curl currentweather-YOURUSERNAME.gigantic.io` and replace YOURUSERNAME with your Giant Swarm username.
 
 For all build and deploy details see the [Makefile](Makefile).
+
+For further documentation and guides see the [docs](https:://docs.giantswarm.io). 
+
+## In other languages
+
+* [Golang](https://github.com/giantswarm/giantswarm-firstapp-go)
+* [NodeJS](https://github.com/giantswarm/giantswarm-firstapp-Node)
