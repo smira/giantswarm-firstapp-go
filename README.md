@@ -34,4 +34,4 @@ For further documentation and guides see the [docs](https:://docs.giantswarm.io)
 ## In other languages
 
 * [Golang](https://github.com/giantswarm/giantswarm-firstapp-go)
-* [NodeJS](https://github.com/giantswarm/giantswarm-firstapp-Node)
+* [NodeJS](https://github.com/giantswarm/giantswarm-firstapp-nodejs)
