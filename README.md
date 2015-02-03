@@ -29,9 +29,11 @@ To test it run something like: `curl currentweather-YOURUSERNAME.gigantic.io` an
 
 For all build and deploy details see the [Makefile](Makefile).
 
-For further documentation and guides see the [docs](https:://docs.giantswarm.io). 
+For further documentation and guides see the [docs](https://docs.giantswarm.io). 
 
 ## In other languages
 
 * [Golang](https://github.com/giantswarm/giantswarm-firstapp-go)
 * [NodeJS](https://github.com/giantswarm/giantswarm-firstapp-nodejs)
+* [Ruby](https://github.com/giantswarm/giantswarm-firstapp-ruby)
+* [Python](https://github.com/giantswarm/giantswarm-firstapp-python)
