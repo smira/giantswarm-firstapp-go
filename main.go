@@ -34,7 +34,7 @@ func main() {
 	http.HandleFunc("/", currentWeatherHandler)
 
 	go func() {
-		log.Println("Starting current weather server")
+		log.Println("Starting current weather server at :8080")
 		log.Fatal(http.ListenAndServe(":8080", nil))
 	}()
 
@@ -87,6 +87,7 @@ func getWeatherReportData() ([]byte, error) {
 func cacheReport(f func() ([]byte, error)) ([]byte, error) {
 	data, _ := redis.Bytes(redisCon.Do("GET", "report"))
 	if len(data) == 0 {
+		log.Println("Querying live weather data")
 		res, err := f()
 		if err != nil {
 			return nil, err
@@ -94,6 +95,8 @@ func cacheReport(f func() ([]byte, error)) ([]byte, error) {
 		redisCon.Do("SET", "report", res)
 		redisCon.Do("EXPIRE", "report", 60)
 		data = res
+	} else {
+		log.Println("Using cached weather data")
 	}
 	return data, nil
 }

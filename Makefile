@@ -51,7 +51,14 @@ docker-push: docker-build
 	docker push $(REGISTRY)/$(USERNAME)/$(PROJECT)
 
 docker-pull:
+	docker pull redis
 	docker pull $(REGISTRY)/$(USERNAME)/$(PROJECT)
+
+docker-run-redis:
+	docker run --name=redis -d redis
+
+docker-run: docker-build
+	docker run --link redis:redis -p 8080:8080 -ti --rm $(REGISTRY)/$(USERNAME)/$(PROJECT)
 
 swarm-delete:
 	swarm delete $(PROJECT)
