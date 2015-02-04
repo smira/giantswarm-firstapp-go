@@ -92,8 +92,7 @@ func cacheReport(f func() ([]byte, error)) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		redisCon.Do("SET", "report", res)
-		redisCon.Do("EXPIRE", "report", 60)
+		redisCon.Do("SETEX", "report", 60, res)
 		data = res
 	} else {
 		log.Println("Using cached weather data")
