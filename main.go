@@ -1,12 +1,14 @@
 package main
 
 import (
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -45,7 +47,7 @@ func main() {
 }
 
 func currentWeatherHandler(w http.ResponseWriter, r *http.Request) {
-	report, err := getWeatherReport()
+	report, err := getWeatherReport(r.URL.Query().Get("q"))
 	if err != nil {
 		fmt.Fprintf(w, "Cannot get weather data: %s\n", err)
 	} else {
@@ -54,10 +56,10 @@ func currentWeatherHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getWeatherReport() (WeatherReport, error) {
+func getWeatherReport(query string) (WeatherReport, error) {
 	var report WeatherReport
 
-	data, err := cacheReport(getWeatherReportData)
+	data, err := cacheReport(getWeatherReportData, query)
 	if err != nil {
 		return report, err
 	}
@@ -69,9 +71,14 @@ func getWeatherReport() (WeatherReport, error) {
 	return report, nil
 }
 
-func getWeatherReportData() ([]byte, error) {
+func getWeatherReportData(query string) ([]byte, error) {
 	var data []byte
-	resp, err := http.Get("http://api.openweathermap.org/data/2.5/weather?q=Cologne")
+
+	if query == "" {
+		query = "Cologne"
+	}
+
+	resp, err := http.Get("http://api.openweathermap.org/data/2.5/weather?q=" + url.QueryEscape(query))
 	if err != nil {
 		return data, err
 	}
@@ -84,15 +91,16 @@ func getWeatherReportData() ([]byte, error) {
 	return data, nil
 }
 
-func cacheReport(f func() ([]byte, error)) ([]byte, error) {
-	data, _ := redis.Bytes(redisCon.Do("GET", "report"))
+func cacheReport(f func(string) ([]byte, error), param string) ([]byte, error) {
+	key := fmt.Sprintf("report_%x", md5.Sum([]byte(param)))
+	data, _ := redis.Bytes(redisCon.Do("GET", key))
 	if len(data) == 0 {
 		log.Println("Querying live weather data")
-		res, err := f()
+		res, err := f(param)
 		if err != nil {
 			return nil, err
 		}
-		redisCon.Do("SETEX", "report", 60, res)
+		redisCon.Do("SETEX", key, 60, res)
 		data = res
 	} else {
 		log.Println("Using cached weather data")
