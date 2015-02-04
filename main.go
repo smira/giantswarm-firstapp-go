@@ -50,7 +50,7 @@ func currentWeatherHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Cannot get weather data: %s\n", err)
 	} else {
 		celsius := report.Main.Temperature - 273
-		fmt.Fprintf(w, "Current temperature is %.2f °C\n", celsius)
+		fmt.Fprintf(w, "Current temperature is %.1f °C\n", celsius)
 	}
 }
 
