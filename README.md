@@ -2,6 +2,10 @@
 
 This is a simple example to write Golang applications and deploy them on [Giant Swarm]((https://giantswarm.io/)). It pings an external API and caches the data in an Redis cache.
 
+Check out the full tutorial:
+
+http://docs.giantswarm.io/guides/your-first-application/golang/
+
 ## Prerequisites
 
 * Have a Giant Swarm account and the [swarm cli](http://docs.giantswarm.io/installation/gettingstarted/#installing-the-cli) running. [Request a free invite](https://giantswarm.io/).
